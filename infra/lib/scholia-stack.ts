@@ -13,7 +13,7 @@ import {
 } from 'aws-cdk-lib/aws-cloudfront'
 import {FunctionUrlOrigin} from 'aws-cdk-lib/aws-cloudfront-origins'
 import {Platform} from 'aws-cdk-lib/aws-ecr-assets'
-import {PolicyStatement} from 'aws-cdk-lib/aws-iam'
+import {PolicyStatement, ServicePrincipal} from 'aws-cdk-lib/aws-iam'
 import {DockerImageCode, DockerImageFunction, FunctionUrlAuthType, InvokeMode} from 'aws-cdk-lib/aws-lambda'
 import {RetentionDays} from 'aws-cdk-lib/aws-logs'
 import type {Construct} from 'constructs'
@@ -87,6 +87,14 @@ export class ScholiaStack extends Stack {
       domainNames: props.domainName && cert ? [props.domainName] : undefined,
       certificate: cert,
       comment: 'Scholia',
+    })
+
+    // Function URLs created after October 2025 also require lambda:InvokeFunction for the CloudFront
+    // principal; the OAC helper only grants lambda:InvokeFunctionUrl.
+    fn.addPermission('CloudFrontInvoke', {
+      principal: new ServicePrincipal('cloudfront.amazonaws.com'),
+      action: 'lambda:InvokeFunction',
+      sourceArn: dist.distributionArn,
     })
 
     new CfnOutput(this, 'FunctionUrl', {value: url.url})
