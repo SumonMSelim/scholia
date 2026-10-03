@@ -1,6 +1,13 @@
 import {readClient} from './client'
 
-export type CourseSummary = {_id: string; title: string; code: string; institution?: string; term?: string}
+export type CourseSummary = {
+  _id: string
+  title: string
+  code: string
+  institution?: string
+  term?: string
+  starters?: Partial<Record<'study' | 'assignment' | 'improve' | 'revise' | 'exam', string[]>>
+}
 export type SourceMap = {
   lectures: {number: number; title: string; videoUrl?: string}[]
   slidesUrl?: string
@@ -10,7 +17,7 @@ export type SourceMap = {
 }
 
 export const getCourses = () =>
-  readClient.fetch<CourseSummary[]>(`*[_type=="course"] | order(code) {_id, title, code, institution, term}`)
+  readClient.fetch<CourseSummary[]>(`*[_type=="course"] | order(code) {_id, title, code, institution, term, starters}`)
 
 export const getSourceMap = (courseId: string) =>
   readClient.fetch<SourceMap>(

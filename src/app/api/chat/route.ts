@@ -4,6 +4,7 @@ import {agentModel} from '@/lib/agent/models'
 import {contextMcp} from '@/lib/agent/context-mcp'
 import {MODES, MODE_PROMPTS, type Mode} from '@/lib/agent/prompts'
 import {examPlan, lookupSource, saveWebReference, weakTopics, webSearch} from '@/lib/agent/tools'
+import {finalAnswerStep, MAX_STEPS} from '@/lib/agent/steps'
 import {readClient} from '@/lib/sanity/client'
 
 export const maxDuration = 120
@@ -19,10 +20,13 @@ export async function POST(req: Request) {
   if (!parsed.success) return Response.json({error: parsed.error.flatten()}, {status: 400})
   const {messages, mode, courseId} = parsed.data
 
-  const course = await readClient.fetch<{title: string; code: string} | null>(`*[_type=="course" && _id==$id][0]{title, code}`, {id: courseId})
+  const course = await readClient.fetch<{title: string; code: string; contextEndpoint?: string} | null>(
+    `*[_type=="course" && _id==$id][0]{title, code, contextEndpoint}`,
+    {id: courseId},
+  )
   if (!course) return Response.json({error: 'Unknown course'}, {status: 404})
 
-  const mcp = await contextMcp()
+  const mcp = await contextMcp(course.contextEndpoint)
   const kbTools = await mcp.tools()
 
   const result = streamText({
@@ -37,7 +41,8 @@ export async function POST(req: Request) {
       web_search: webSearch(),
       save_web_reference: saveWebReference(courseId),
     },
-    stopWhen: stepCountIs(8),
+    stopWhen: stepCountIs(MAX_STEPS),
+    prepareStep: finalAnswerStep,
     onFinish: async () => {
       await mcp.close()
     },
