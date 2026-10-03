@@ -23,12 +23,19 @@ export function parseCitations(text: string): Citation[] {
     const kind = m[1].toLowerCase()
     const body = m[2].trim()
     let c: Citation | null = null
+    const found: Citation[] = []
     if (kind === 'lecture') {
-      const mm = /^(\d+)\s*@\s*(\d{1,2}:\d{2}(?::\d{2})?)/.exec(body)
-      if (mm) c = {kind, lecture: Number(mm[1]), sec: toSec(mm[2]), label}
+      // "[lecture 6 @ 4:53, 8:43]" lists several moments; emit one citation per timestamp.
+      const mm = /^(\d+)\s*@\s*(.+)$/.exec(body)
+      for (const ts of mm?.[2].match(/\d{1,2}:\d{2}(?::\d{2})?/g) ?? []) {
+        found.push({kind, lecture: Number(mm![1]), sec: toSec(ts), label: `[lecture ${mm![1]} @ ${ts}]`})
+      }
     } else if (kind === 'slides') {
-      const mm = /^(\d+)\s*#\s*(\d+)/.exec(body)
-      if (mm) c = {kind, lecture: Number(mm[1]), slide: Number(mm[2]), label}
+      const mm = /^(\d+)\s*(#.+)$/.exec(body)
+      for (const n of mm?.[2].match(/#\s*(\d+)/g) ?? []) {
+        const slide = Number(n.replace(/\D/g, ''))
+        found.push({kind, lecture: Number(mm![1]), slide, label: `[slides ${mm![1]} #${slide}]`})
+      }
     } else if (kind === 'book') {
       const mm = /ch\.?\s*(\d+)\s*,?\s*p\.?\s*(\d+)/i.exec(body)
       if (mm) c = {kind, chapter: Number(mm[1]), page: Number(mm[2]), label}
@@ -46,9 +53,12 @@ export function parseCitations(text: string): Citation[] {
         c = null
       }
     }
-    if (c && !seen.has(label)) {
-      seen.add(label)
-      out.push(c)
+    if (c) found.push(c)
+    for (const f of found) {
+      if (!seen.has(f.label)) {
+        seen.add(f.label)
+        out.push(f)
+      }
     }
   }
   return out
