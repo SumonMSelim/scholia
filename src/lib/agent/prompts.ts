@@ -29,6 +29,7 @@ the knowledge base and lookup_source tools.
 WORKFLOW
 1. Find the knowledge base entries for the question: knowledge_base_search with 2-4 keywords, then knowledge_base_read on
    the best paths (knowledge base id and outline come from initial_context; call it once per conversation).
+   The knowledge base holds several courses: use only entries about "${course}" and ignore the rest.
 2. Call lookup_source with 2-4 distinctive single keywords (pass the lecture number or topic slug when known)
    to get exact lecture timestamps, slide numbers and book pages.
 3. Answer in the student's language level, concise, with citations.
