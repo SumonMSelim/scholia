@@ -63,10 +63,18 @@ docker compose run --rm tools npx tsx scripts/ingest/push.ts $C
 docker compose run --rm tools npx sanity schema deploy
 ```
 
-Then, per course, in the Sanity Dashboard: Context → New knowledge base → Dataset source with a query
-limited to that course (new courses prefix their ids, e.g. `*[string::startsWith(_id, "6-0002-") || _id == "course-6-0002"]`)
-→ Build entries → create an MCP endpoint with that Knowledge Base as its only source. Put the URL in the
-course's `contextEndpoint` (seed or Studio). Courses without one use `SANITY_CONTEXT_MCP_URL`.
+Then, once, in the Sanity Dashboard: Context → New knowledge base → Dataset source with the query below
+→ Build entries → create an MCP endpoint and put its URL in `SANITY_CONTEXT_MCP_URL`. One Knowledge Base
+serves every course; the agent is told to use only entries about the selected course, and `lookup_source`
+filters by course in GROQ. The query indexes the explanatory types only (106 documents), to stay under the
+plan's 150 indexed documents per organisation. Slides and book chapters are reached through `lookup_source`,
+submissions through `weak_topics` and learning objectives through `exam_plan`.
+
+```groq
+*[_type in ["course", "topic", "lecture", "assignment", "examScope", "book"]]
+```
+
+A course can still point at its own endpoint through `contextEndpoint` (seed or Studio).
 
 Tests and checks:
 
@@ -88,8 +96,7 @@ docker compose run --rm cdk npx cdk deploy -c domain=scholia.mol.la -c certArn=a
 ## Stack
 
 Next.js 16, Sanity 6 (embedded Studio), Vercel AI SDK 7 with `@ai-sdk/mcp`, Amazon Bedrock (Nova 2 Lite),
-Tavily, AWS CDK. An earlier prototype of the idea, `SumonMSelim/scholia-aws` (Go, Bedrock, no Sanity),
-informed the refusal wording and the mock-exam flow; no code was reused.
+Tavily, AWS CDK.
 
 ## License
 
