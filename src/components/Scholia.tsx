@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import {useEffect, useMemo, useRef, useState} from 'react'
 import {useChat} from '@ai-sdk/react'
 import {DefaultChatTransport, type UIMessage} from 'ai'
@@ -66,7 +67,7 @@ export function Scholia({courses, course, sources}: Props) {
     <main className="mx-auto flex h-full max-w-7xl flex-col gap-3 px-3 py-3 sm:px-4">
       <header className="flex flex-wrap items-center gap-2 sm:gap-3">
         <div className="flex items-center gap-2">
-          <span aria-hidden className="grid h-7 w-7 place-items-center rounded-md bg-accent text-sm font-bold text-accent-fg">S</span>
+          <Image src="/icon.svg" alt="" width={28} height={28} unoptimized className="h-7 w-7" />
           <h1 className="text-lg font-semibold tracking-tight">Scholia</h1>
         </div>
         <form method="get" className="min-w-0 flex-1 sm:order-none sm:ml-2 sm:max-w-md">
