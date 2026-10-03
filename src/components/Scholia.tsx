@@ -13,11 +13,12 @@ import {CitationPanel} from './CitationPanel'
 import {ThemeToggle} from './ThemeToggle'
 import {WeakTopicsPanel, type WeakTopicsResult} from './WeakTopicsPanel'
 
-const STARTERS: Record<Mode, string[]> = {
-  study: ['Explain aliasing vs cloning with lists', 'What is bisection search and when does it apply?', 'Why does recursion need a base case?', 'What is the complexity of bisect_search1 with list slicing?'],
-  assignment: ['Help me start Problem Set 4 part A (permutations)', 'Review my approach for the Hangman helper functions'],
-  improve: ['What should I improve before the final quiz?'],
-  revise: ['Revision sheet for recursion', 'Revision sheet for the whole final quiz scope'],
+// Used when the course document has no starters for a mode.
+const FALLBACK_STARTERS: Record<Mode, string[]> = {
+  study: ['What are the main ideas of the first lecture?'],
+  assignment: ['Help me start the first problem set'],
+  improve: ['What should I improve before the exam?'],
+  revise: ['Revision sheet for the whole exam scope'],
   exam: ['Start a 3-question mock exam'],
 }
 
@@ -37,6 +38,8 @@ export function Scholia({courses, course, sources}: Props) {
   const transport = useMemo(() => new DefaultChatTransport({api: '/api/chat', fetch: fetchWithBodyHash}), [])
   const {messages, sendMessage, status, error, setMessages} = useChat({transport})
   const busy = status === 'submitted' || status === 'streaming'
+  const courseStarters = course?.starters?.[mode] ?? []
+  const starters = courseStarters.length ? courseStarters : FALLBACK_STARTERS[mode]
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const citations = useMemo(() => collectCitations(messages), [messages])
@@ -111,7 +114,7 @@ export function Scholia({courses, course, sources}: Props) {
                   <strong className="text-fg">{MODE_LABELS[mode]}.</strong> {MODE_HINT[mode]}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {STARTERS[mode].map((s) => (
+                  {starters.map((s) => (
                     <button
                       key={s}
                       type="button"

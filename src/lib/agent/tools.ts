@@ -35,8 +35,9 @@ export const lookupSource = (courseId: string) =>
           .join(' || ')
       const lectureFilter = lecture ? ` && number == ${Number(lecture)}` : ''
       const deckFilter = lecture ? ` && lecture->number == ${Number(lecture)}` : ''
-      const topicFilter = topic ? ` && references($topic)` : ''
-      if (topic) params.topic = `topic-${topic.replace(/[^\w-]/g, '')}`
+      // Topic ids carry a per-course prefix, so resolve the slug within this course.
+      const topicFilter = topic ? ` && references(*[_type=="topic" && course._ref==$course && slug.current==$topic]._id)` : ''
+      if (topic) params.topic = topic.replace(/[^\w-]/g, '')
       type Lec = {lecture: number; title: string; hits: {startSec: number; endSec: number; text: string}[]}
       type Deck = {lecture: number; hits: {number: number; title: string; text: string}[]}
       type Chap = {chapter: number; chapterTitle: string; hits: {title: string; pageStart: number; pageEnd: number; text: string}[]}

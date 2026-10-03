@@ -6,8 +6,14 @@ Scholia turns everything a course throws at a student (lecture recordings, slide
 assignments, graded submissions) into typed Sanity documents, builds a Sanity Knowledge Base on top, and
 puts an agent in front of it. Every answer cites the exact lecture second, slide number or book page.
 
-Built for the DEV x Sanity Challenge (Path One). Demo course: MIT OCW 6.0001 (CC BY-NC-SA 4.0) with
-Think Python 2e (CC BY-NC 3.0). The student's submissions and grader feedback are fictional.
+Built for the DEV x Sanity Challenge (Path One). Three demo courses from MIT OpenCourseWare (CC BY-NC-SA 4.0),
+each paired with an openly licensed textbook:
+
+- 6.0001 Introduction to Computer Science and Programming in Python, with Think Python 2e (CC BY-NC 3.0)
+- 6.0002 Introduction to Computational Thinking and Data Science, with Think Stats 2e (CC BY-NC-SA 4.0)
+- 6.006 Introduction to Algorithms, with Open Data Structures (CC BY 2.5 CA)
+
+The student's submissions and grader feedback are fictional.
 
 - Sanity project `dqd1lxzm`, dataset `production` (public)
 - Live: https://scholia.mol.la
@@ -45,18 +51,22 @@ cp .env.example .env            # fill in tokens
 docker compose up               # http://localhost:3000, Studio at /studio
 ```
 
-Ingest the demo course (downloads openly licensed material into `data/raw`, gitignored):
+Ingest a course. Each course is a seed in `scripts/ingest/courses/<course>.ts` (topics, objectives, rubrics,
+fictional submissions, exam scope); everything else is downloaded and parsed. Material lands in `data/raw`
+(gitignored).
 
 ```sh
-./scripts/download-sources.sh
-docker compose run --rm tools npx tsx scripts/ingest/build.ts
-docker compose run --rm tools npx tsx scripts/ingest/push.ts
-docker compose run --rm tools npx tsx scripts/ingest/verify.ts
+C=6-0001   # or 6-0002, 6-006
+docker compose run --rm tools npx tsx scripts/ingest/download.ts $C
+docker compose run --rm tools npx tsx scripts/ingest/build.ts $C
+docker compose run --rm tools npx tsx scripts/ingest/push.ts $C
 docker compose run --rm tools npx sanity schema deploy
 ```
 
-Then in the Sanity Dashboard: Context → New knowledge base → Dataset source → Build entries → create an
-MCP endpoint with the Knowledge Base as its only source, and put its URL in `.env`.
+Then, per course, in the Sanity Dashboard: Context → New knowledge base → Dataset source with a query
+limited to that course (new courses prefix their ids, e.g. `*[string::startsWith(_id, "6-0002-") || _id == "course-6-0002"]`)
+→ Build entries → create an MCP endpoint with that Knowledge Base as its only source. Put the URL in the
+course's `contextEndpoint` (seed or Studio). Courses without one use `SANITY_CONTEXT_MCP_URL`.
 
 Tests and checks:
 

@@ -11,6 +11,21 @@ export const course = defineType({
     defineField({name: 'term', type: 'string', description: 'e.g. Fall 2016'}),
     defineField({name: 'description', type: 'text', rows: 4}),
     defineField({name: 'source', type: 'sourceInfo'}),
+    defineField({
+      name: 'contextEndpoint',
+      title: 'Context MCP endpoint',
+      type: 'url',
+      description: "Sanity Context MCP endpoint serving this course's Knowledge Base. Empty: the app's default endpoint.",
+    }),
+    defineField({
+      name: 'starters',
+      title: 'Starter questions',
+      type: 'object',
+      description: 'Suggested first questions per mode, shown in the empty chat.',
+      fields: ['study', 'assignment', 'improve', 'revise', 'exam'].map((mode) =>
+        defineField({name: mode, type: 'array', of: [{type: 'string'}]}),
+      ),
+    }),
   ],
   preview: {select: {title: 'title', subtitle: 'code'}},
 })

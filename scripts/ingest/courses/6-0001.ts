@@ -1,7 +1,9 @@
-// Curated structure for the demo course. Everything derived from material (transcripts, slides,
+// Curated structure for MIT 6.0001. Everything derived from material (transcripts, slides,
 // book text, problem set text) is parsed in build.ts; this file holds what a course staff
 // member would author by hand: topics, objectives, mappings, rubrics, the (fictional) student's
 // submissions and feedback, and the exam scope.
+
+import type {CourseSeed, Feedback, Rubric} from './types'
 
 export const LICENSE_OCW = 'CC BY-NC-SA 4.0'
 export const OCW_URL =
@@ -97,8 +99,6 @@ export const chapterTopics: Record<number, TopicId[]> = {
   19: ['tuples-lists-mutability', 'dictionaries'],
 }
 
-export type Rubric = {key: string; title: string; description: string; maxPoints: number; topics: TopicId[]}
-
 export const assignments: {
   n: number
   title: string
@@ -172,7 +172,6 @@ export const assignments: {
 
 // The student's submissions. Fictional, but the mistakes are the ones this course's TAs see
 // every year. Feedback items point at rubric keys; rubric criteria point at topics.
-export type Feedback = {criterionKey: string; pointsAwarded: number; severity: 'strength' | 'minor' | 'major'; comment: string}
 
 export const submissions: {
   assignment: number
@@ -254,4 +253,44 @@ export const examScope = {
     ['searching-and-sorting', 4, 'Compare algorithms by complexity'],
   ] as [TopicId, number, string][],
   objectives: ['LO2', 'LO3', 'LO4', 'LO5', 'LO6', 'LO7', 'LO8', 'LO9'],
+}
+
+const lectureSlugs: Record<number, string> = {
+  1: 'what-is-computation',
+  2: 'branching-and-iteration',
+  3: 'string-manipulation-guess-and-check-approximations-bisection',
+  4: 'decomposition-abstraction-and-functions',
+  5: 'tuples-lists-aliasing-mutability-and-cloning',
+  6: 'recursion-and-dictionaries',
+  7: 'testing-debugging-exceptions-and-assertions',
+  8: 'object-oriented-programming',
+  9: 'python-classes-and-inheritance',
+  10: 'understanding-program-efficiency-part-1',
+  11: 'understanding-program-efficiency-part-2',
+  12: 'searching-and-sorting',
+}
+
+export const seed: CourseSeed = {
+  dir: '6-0001',
+  idPrefix: '',
+  ocwUrl: OCW_URL,
+  license: LICENSE_OCW,
+  attribution: 'MIT OpenCourseWare, 6.0001 Fall 2016',
+  course,
+  topics,
+  objectives,
+  lectures: lectures.map((l) => ({...l, resource: `lecture-${l.n}-${lectureSlugs[l.n]}`, slides: `mit6_0001f16_lec${l.n}`})),
+  slideFurniture: /^6\.0001 LECTURE \d+ ?\d*$/i,
+  book: {...book, pdfUrl: 'https://greenteapress.com/thinkpython2/thinkpython2.pdf'},
+  chapterTopics,
+  assignments: assignments.map((a) => ({...a, resource: a.n === 1 ? 'mit6_0001f16_ps1' : `ps${a.n}`})),
+  submissions,
+  examScope,
+  starters: {
+    study: ['Explain aliasing vs cloning with lists', 'What is bisection search and when does it apply?', 'Why does recursion need a base case?', 'What is the complexity of bisect_search1 with list slicing?'],
+    assignment: ['Help me start Problem Set 4 part A (permutations)', 'Review my approach for the Hangman helper functions'],
+    improve: ['What should I improve before the final quiz?'],
+    revise: ['Revision sheet for recursion', 'Revision sheet for the whole final quiz scope'],
+    exam: ['Start a 3-question mock exam'],
+  },
 }
