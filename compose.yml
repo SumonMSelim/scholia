@@ -1,0 +1,53 @@
+services:
+  web:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- -H 0.0.0.0"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - ~/.aws:/root/.aws:ro
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - NEXT_TELEMETRY_DISABLED=1
+      - AWS_REGION=us-east-1
+      - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID:-dqd1lxzm}
+      - NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET:-production}
+
+  # One-off tooling: `docker compose run --rm tools <cmd>`
+  tools:
+    image: node:22-alpine
+    working_dir: /app
+    profiles: ["tools"]
+    volumes:
+      - .:/app
+      - ~/.aws:/root/.aws:ro
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID:-dqd1lxzm}
+      - NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET:-production}
+      - AWS_REGION=us-east-1
+
+  # Infra: `docker compose run --rm cdk npx cdk deploy`
+  cdk:
+    build: ./infra
+    profiles: ["tools"]
+    working_dir: /app/infra
+    volumes:
+      - .:/app
+      - ~/.aws:/root/.aws:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - AWS_REGION=us-east-1
+      - CDK_DEFAULT_REGION=us-east-1
+      - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID:-dqd1lxzm}
+      - NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET:-production}
