@@ -1,0 +1,8 @@
+node_modules
+.next
+.git
+data
+infra/cdk.out
+infra/node_modules
+.env*
+!.env.example
