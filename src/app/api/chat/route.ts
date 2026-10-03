@@ -4,7 +4,7 @@ import {agentModel} from '@/lib/agent/models'
 import {contextMcp} from '@/lib/agent/context-mcp'
 import {MODES, MODE_PROMPTS, type Mode} from '@/lib/agent/prompts'
 import {examPlan, lookupSource, saveWebReference, weakTopics, webSearch} from '@/lib/agent/tools'
-import {finalAnswerStep, MAX_STEPS} from '@/lib/agent/steps'
+import {MAX_STEPS, prepareAgentStep} from '@/lib/agent/steps'
 import {readClient} from '@/lib/sanity/client'
 
 export const maxDuration = 120
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
       save_web_reference: saveWebReference(courseId),
     },
     stopWhen: stepCountIs(MAX_STEPS),
-    prepareStep: finalAnswerStep,
+    prepareStep: prepareAgentStep,
     onFinish: async () => {
       await mcp.close()
     },

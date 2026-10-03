@@ -85,7 +85,7 @@ The ingest pipeline is plain TypeScript. It parses the OCW caption files (VTT) i
 
 ### Knowledge Base and Context MCP
 
-One Knowledge Base covers all three courses: 232 documents from the `production` dataset, served through one Context MCP endpoint. Two things keep answers inside the selected course. The agent is told to use only Knowledge Base entries about that course, and every source lookup is filtered by course in GROQ, so a citation can never point into another course. A course document can also name its own endpoint, for when a course outgrows the shared Knowledge Base.
+One Knowledge Base serves all three courses through one Context MCP endpoint. The plan I am on indexes at most 150 documents per organisation, and the three courses have 232, so the Knowledge Base gets the 140 documents that explain: courses, topics, learning objectives, lectures with their full transcripts, assignments with rubrics, graded submissions and exam scopes. Slide decks and book chapters stay out of it, and the agent reaches them through `lookup_source`, which queries the dataset directly. Two things keep answers inside the selected course. The agent is told to use only Knowledge Base entries about that course, and every source lookup is filtered by course in GROQ, so a citation can never point into another course.
 
 The agent connects to a Context MCP endpoint in Knowledge Base mode, with an organisation token, through `@ai-sdk/mcp`. It uses the three tools the endpoint exposes:
 
