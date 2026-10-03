@@ -1,6 +1,6 @@
 ---
 title: "Scholia: an AI study partner that answers from course knowledgebase"
-published: false
+published: true
 tags: devchallenge, sanitychallenge, sanity, ai
 ---
 
@@ -56,15 +56,12 @@ Try these:
 - Mock exam: *Start a mock exam.* Then answer the first question.
 - Study: *What is the walrus operator?* (watch it leave the course)
 
-<!-- upload docs/dev-post/study-light.png -->
-![Study mode: the answer cites Lecture 6 at 4:53, slide 6 and Lecture 6 at 19:18 inline, and the panel lists the same sources](study-light.png)
+![Study mode: the answer cites Lecture 6 at 4:53, slide 6 and Lecture 6 at 19:18 inline, and the panel lists the same sources](https://raw.githubusercontent.com/SumonMSelim/scholia/main/docs/dev-post/study-light.png)
 
-<!-- upload docs/dev-post/web-fallback.png -->
-![A question the course does not cover: one sentence saying so, then an answer from docs.python.org under Outside course material](web-fallback.png)
+![A question the course does not cover: one sentence saying so, then an answer from docs.python.org under Outside course material](https://raw.githubusercontent.com/SumonMSelim/scholia/main/docs/dev-post/web-fallback.png)
 
-<!-- upload docs/dev-post/study-dark.png and docs/dev-post/mobile.png -->
-![Dark theme](study-dark.png)
-![Phone layout](mobile.png)
+![Dark theme](https://raw.githubusercontent.com/SumonMSelim/scholia/main/docs/dev-post/study-dark.png)
+![Phone layout](https://raw.githubusercontent.com/SumonMSelim/scholia/main/docs/dev-post/mobile.png)
 
 ## Code
 
@@ -88,7 +85,7 @@ The ingest pipeline is plain TypeScript. It parses the OCW caption files (VTT) i
 
 ### Knowledge Base and Context MCP
 
-Each course has its own Knowledge Base, built from the `production` dataset with a GROQ query limited to that course's documents, and its own Context MCP endpoint. The course document stores its endpoint, so switching course in the app switches Knowledge Base. The 6.0001 Knowledge Base covers 77 documents in 16 entries. The build reported two issues. One of them is the `bisect_search1` conflict above, which is a fair reading of a slide that changes its mind halfway down.
+One Knowledge Base covers all three courses: 232 documents from the `production` dataset, served through one Context MCP endpoint. Two things keep answers inside the selected course. The agent is told to use only Knowledge Base entries about that course, and every source lookup is filtered by course in GROQ, so a citation can never point into another course. A course document can also name its own endpoint, for when a course outgrows the shared Knowledge Base.
 
 The agent connects to a Context MCP endpoint in Knowledge Base mode, with an organisation token, through `@ai-sdk/mcp`. It uses the three tools the endpoint exposes:
 
@@ -127,8 +124,3 @@ Two things cost me time here. Function URLs created after October 2025 need `lam
 - **Public query example:** https://dqd1lxzm.apicdn.sanity.io/v2026-10-01/data/query/production?query=*%5B_type%3D%3D%22lecture%22%5D%7Bnumber%2Ctitle%2C%22segments%22%3Acount(segments)%7D
 - **Studio:** https://scholia.mol.la/studio
 
-## Agent Session
-
-<!-- Upload the Claude Code transcript with the Agent Sessions uploader, press "Make Public", and paste the embed here. -->
-
-I built Scholia with Claude Code. The session covers the schema design, the ingest pipeline, the agent tools, the debugging of model behaviour, and the AWS deploy.
