@@ -1,5 +1,5 @@
 ---
-title: Scholia - a study partner that cites the lecture second, the slide and the page
+title: "Scholia: an AI study partner that answers from course knowledgebase"
 published: false
 tags: devchallenge, sanitychallenge, sanity, ai
 ---
@@ -119,7 +119,6 @@ Two things cost me time here. Function URLs created after October 2025 need `lam
 - **It did not mention the conflict.** The Knowledge Base flagged `bisect_search1`, the Study prompt says to mention conflicts, and Scholia answered O(n) without saying the slide also writes O(n log n). The answer is the right one, but a student reading that slide would be confused, and Scholia should have said why.
 - **A bug I found while writing this post.** On the live site, Improve mode once spent its whole step budget on eight lookups and ended without an answer. The agent now gets ten steps, and on the last one it is told to stop looking things up and answer from what it has. Simply removing the tools on that step looked cleaner, but the Bedrock provider then also drops every earlier tool result from the request, so the answer would have lost its sources.
 - **Slide text is lossy.** Many OCW slides use two columns, and PDF text extraction interleaves them (see slide 14 above). Segments from the captions are much cleaner, which is one reason lecture timestamps are the most precise citations.
-- **The idea is older than this challenge.** An earlier prototype, [scholia-aws](https://github.com/SumonMSelim/scholia-aws) (Go, Bedrock, no Sanity), informed the refusal wording and the mock exam flow. No code was reused. This repository started empty on October 3.
 
 ## Sanity Project Details
 
